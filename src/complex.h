@@ -15,5 +15,6 @@ Complex complex_sub(Complex c1, Complex c2);
 Complex complex_mult(Complex c1, Complex c2);
 Complex complex_scale(Complex c, double scalar);
 double complex_magnitude(Complex c);
+void complex_print(Complex c);
 
 #endif

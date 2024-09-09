@@ -1,6 +1,8 @@
 #include "src/complex.h"
 #include "src/utils.h" 
+
 #include <math.h>
+#include <stdio.h>
 #include <raylib.h>
 
 
@@ -36,6 +38,10 @@ Complex complex_scale(Complex c, double scalar) {
 
 double complex_magnitude(Complex c) {
     return sqrt(c.real * c.real + c.img * c.img); 
+}
+
+void complex_print(Complex c) {
+    printf("(%f + i%f)", c.real, c.img);
 }
 
 

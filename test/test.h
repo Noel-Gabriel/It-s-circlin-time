@@ -4,5 +4,6 @@
 void test_darray(void);
 void test_utils(void);
 void test_complex(void);
+void test_core(void);
 
 #endif
