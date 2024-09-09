@@ -78,3 +78,21 @@ Complex* core_lerp_trace(DArray* trace, double dt, size_t* num_points) {
     free(segment_lengths);
     return points;
 }
+
+Complex core_numeric_integration(Complex* samples, double dt, size_t num_samples) {
+    Complex integral = {0, 0};
+    for(int i = 0; i < num_samples; ++i) {
+        integral = complex_add(integral, complex_scale(samples[i], dt));
+    }
+    return integral;
+}
+
+/**
+ * Uses numerical integration to compute num_coeffs coefficients from
+ * -n/2 to n/2. in the fourier series of the curve given by the points in trace.
+ *
+ * dt determines the step size in the numerical integration.
+ */
+Complex* core_fourier_coeffs(DArray* trace, double dt, size_t num_coeffs) {
+    return NULL; 
+}

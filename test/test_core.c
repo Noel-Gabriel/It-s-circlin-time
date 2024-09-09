@@ -8,10 +8,12 @@
 
 void test_core_segment_lengths(void);
 void test_core_lerp_trace(void);
+void test_core_numeric_integration(void);
 
 void test_core(void) {
     test_core_segment_lengths();
     test_core_lerp_trace();
+    test_core_numeric_integration();
 }
 
 void test_core_segment_lengths(void) {
@@ -100,4 +102,45 @@ void test_core_lerp_trace(void) {
     
     free(points);
     darray_free(trace);
+}
+
+void test_core_numeric_integration(void) {
+    
+    size_t num_samples = 10000000;
+
+    // integral of x^2 from 0 to 2
+    int from = 0;
+    int to = 2;
+    Complex* points = malloc(num_samples * sizeof(Complex));
+    double dx = (to - 1.0 * from) / num_samples;
+    double x = from;
+    for(int i = 0; i < num_samples; ++i) {
+        Complex y = {x*x, 0};
+        points[i] = y;
+        x += dx;
+    }
+
+    Complex integral = core_numeric_integration(points, dx, num_samples);
+    // (2^3/3) - (0^3/3) = 8 / 3
+    Complex expected = {1.0*8/3, 0};
+    assert(complex_equal(integral, expected));
+
+    // integral of f(z) = conjugate(z) 
+    // on C(t) = 3t + t^2 from -1 to 4.
+    from = -1;
+    to = 4;
+    double dt = (to - 1.0 * from) / num_samples;
+    double t = from;
+    for(int i = 0; i < num_samples; ++i) {
+        Complex y = {3*t, - (t*t)};
+        points[i] = y;
+        t += dt;
+    }
+
+    integral = core_numeric_integration(points, dt, num_samples);
+    Complex expected2 = {22.5, -21.6667};
+    complex_print(integral);
+    assert(complex_equal(integral, expected2));
+
+    free(points);
 }

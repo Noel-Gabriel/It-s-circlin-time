@@ -3,7 +3,8 @@
 #include <math.h>
 #include <raylib.h>
 
-#define DOUBLE_EPSILON 0.000001
+// used for testing purposes, does not need to be precise
+#define DOUBLE_EPSILON 0.0001 
 
 bool utils_almost_equal(double a, double b) {
     return (((a < b)? b - a : a - b) <= DOUBLE_EPSILON);

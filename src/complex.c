@@ -41,7 +41,7 @@ double complex_magnitude(Complex c) {
 }
 
 void complex_print(Complex c) {
-    printf("(%f + i%f)", c.real, c.img);
+    printf("(%f + %fi)", c.real, c.img);
 }
 
 
