@@ -1,0 +1,4 @@
+target_sources(CirclinTime PRIVATE
+    main.c
+    darray.c darray.h
+    utils.c utils.h)

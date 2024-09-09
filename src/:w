@@ -1,0 +1,20 @@
+#ifndef DYNAMIC_ARRAY_H
+#define DYNAMIC_ARRAY_H
+
+#include <raylib.h>
+#include <stdlib.h>
+
+#define INITIAL_CAPACITY 512
+
+typedef struct {
+    Vector2* points;
+    size_t size;
+    size_t capacity;
+} DArray;
+
+DArray* create_darray(void);
+void insert_darray(DArray* darray, Vector2 p);
+void free_darray(DArray* darray);
+
+
+#endif
