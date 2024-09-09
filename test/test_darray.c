@@ -17,7 +17,7 @@ void test_creation(void) {
 
     assert(darray != NULL);
     assert(darray->capacity == INITIAL_CAPACITY);
-    assert(malloc_size(darray->points) >= INITIAL_CAPACITY);
+    assert(malloc_size(darray->points) / sizeof(Vector2) >= INITIAL_CAPACITY);
     assert(darray->size == 0);
 
     darray_free(darray);
@@ -48,7 +48,7 @@ void test_insertion(void) {
 
     assert(darray->size == INITIAL_CAPACITY + 2);
     assert(darray->capacity == INITIAL_CAPACITY * 2);
-    assert(malloc_size(darray->points) >= darray->capacity);
+    assert(malloc_size(darray->points) / sizeof(Vector2) >= darray->capacity);
 
     darray_clear(darray);
 
