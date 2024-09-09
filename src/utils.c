@@ -2,10 +2,10 @@
 #include <stdbool.h>
 #include <raylib.h>
 
-#define FLOAT_EPSILON 0.000001f
+#define DOUBLE_EPSILON 0.000001
 
-bool utils_almost_equal(float a, float b) {
-    return (((a < b)? b - a : a - b) <= FLOAT_EPSILON);
+bool utils_almost_equal(double a, double b) {
+    return (((a < b)? b - a : a - b) <= DOUBLE_EPSILON);
 }
 
 bool utils_same_vector(Vector2 v1, Vector2 v2) {

@@ -32,6 +32,7 @@ int main(void) {
 #ifdef TEST
     test_darray();
     test_utils();
+    test_complex();
 #endif
 
     DArray* trace = darray_create();
