@@ -1,4 +1,9 @@
-#include "test/test.h"
+#define TEST
+
+#ifdef TEST
+    #include "test/test.h"
+#endif
+
 #include "src/darray.h"
 #include "src/utils.h"
 
@@ -24,7 +29,10 @@ void draw(DArray* trace) {
 }
 
 int main(void) {
+#ifdef TEST
     test_darray();
+    test_utils();
+#endif
 
     DArray* trace = darray_create();
 
