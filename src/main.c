@@ -30,26 +30,26 @@
 #define FPS 60
 
 // Fourier Transform and update
-#define DT 0.0001 
+#define DT 0.0001        // time step through drawn curve from t = 0 to t = 1 
 #define NUM_COEFFS 300 
 #define MAX_SECONDS_PER_LOOP 10
 
 
 
-void read_input(DArray* trace, FourierTransform* ft, Rectangle* canvas) {
+void read_input(DArray* trace, FourierTransform* ft, bool* is_drawing) {
     Vector2 mouse_pos = GetMousePosition();
-    if(!CheckCollisionPointRec(mouse_pos, *canvas)) { return; }
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         circle_free(ft);
         darray_clear(trace);
+        *is_drawing = true;
     }
-    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-        Vector2 mouse_pos = GetMousePosition();
+    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT) && *is_drawing) {
         if(trace->size == 0 
                 || !utils_vector_equal(trace->points[trace->size-1], mouse_pos)) {
             darray_insert(trace, mouse_pos);
         } 
-    } else if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+    } else if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && *is_drawing){
+        *is_drawing = false;
         darray_insert(trace, trace->points[0]);
         if(trace->size < 3) {
             darray_clear(trace);
@@ -113,11 +113,17 @@ int main(void) {
     ft.circles = NULL;
     ft.num_circles = 0;
 
+    // to fix a bug where read_input would not reset if a user
+    // enters the canvas while holding down the mouse button
+    bool is_drawing = false;
 
     SetTargetFPS(FPS);
     while(!WindowShouldClose()) {
-
-        read_input(trace, &ft, &canvas);
+   
+        Vector2 mouse_pos = GetMousePosition();
+        if(CheckCollisionPointRec(mouse_pos, canvas)) {
+            read_input(trace, &ft, &is_drawing);
+        }
 
         BeginDrawing();
             
