@@ -15,6 +15,11 @@ Complex complex_from_vec(Vector2 v) {
     return c;
 }
 
+Vector2 complex_to_vec(Complex c) {
+    Vector2 v = {c.real, c.img};
+    return v;
+}
+
 Complex complex_add(Complex c1, Complex c2) {
     Complex sum = {c1.real + c2.real, c1.img + c2.img};
     return sum;

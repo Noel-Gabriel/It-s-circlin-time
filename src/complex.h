@@ -10,6 +10,7 @@ typedef struct Complex {
 
 bool complex_equal(Complex c1, Complex c2);
 Complex complex_from_vec(Vector2 v);
+Vector2 complex_to_vec(Complex c);
 Complex complex_add(Complex c1, Complex c2);
 Complex complex_sub(Complex c1, Complex c2);
 Complex complex_mult(Complex c1, Complex c2);

@@ -2,6 +2,9 @@
 #define CIRCLE_H
 
 #include "complex.h"
+#include "darray.h"
+#include "dllist.h"
+
 #include <stdlib.h>
 
 typedef struct Circle {
@@ -9,7 +12,16 @@ typedef struct Circle {
     double freq; 
 } Circle;
 
-void circle_step(Circle* circles, size_t num_circles, double dt);
-void circle_draw(Circle* circles, size_t num_circles);
+typedef struct FourierTransform {
+    struct Circle* circles;
+    size_t num_circles;
+    DLList* last_results;
+} FourierTransform;
+
+
+void circle_create(DArray* trace, size_t num_coeffs, double dt, FourierTransform* ft);
+void circle_free(FourierTransform* ft);
+void circle_step(FourierTransform* ft, double angle_update);
+void circle_draw(FourierTransform* ft, size_t num_coeffs);
 
 #endif

@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <raylib.h>
 
-void test_complex_from_vec(void);
+void test_complex_from_to_vec(void);
 void test_complex_add(void);
 void test_complex_sub(void);
 void test_complex_mult(void);
@@ -13,7 +13,7 @@ void test_complex_scale(void);
 void test_complex_magnitude(void);
 
 void test_complex(void) {
-    test_complex_from_vec();
+    test_complex_from_to_vec();
     test_complex_add();
     test_complex_sub();
     test_complex_mult();
@@ -21,18 +21,16 @@ void test_complex(void) {
     test_complex_magnitude();
 }
 
-void test_complex_from_vec(void) {
-    Vector2 v1 = {43.2, -4.3};
-    Complex c1 = complex_from_vec(v1);
+void test_complex_from_to_vec(void) {
+    Vector2 v = {43.2, -4.3};
 
-    Vector2 v2 = {34123.4123, 1231.21};
-    Complex c2 = complex_from_vec(v2);
+    Complex cfromv = complex_from_vec(v);
+    Vector2 ctov = complex_to_vec(cfromv);
 
-    Complex c1expected = {v1.x, v1.y};
-    Complex c2expected = {v2.x, v2.y};
-
-    assert(complex_equal(c1, c1expected));
-    assert(complex_equal(c2, c2expected));
+    assert(cfromv.real == v.x);
+    assert(cfromv.img == v.y);
+    assert(ctov.x == v.x);
+    assert(ctov.y == v.y);
 }
 
 void test_complex_add(void) {
