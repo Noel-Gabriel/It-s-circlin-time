@@ -3,11 +3,17 @@
 #include <math.h>
 #include <raylib.h>
 
-// used for testing purposes, does not need to be precise
-#define DOUBLE_EPSILON 0.0001 
+// to compare doubles
+#define DOUBLE_EPSILON 0.000001 
+// to compare complex numbers (numeric error too large for DOUBLE_EPSILON) 
+#define DOUBLE_ALMOST_EPSILON 0.001
+
+bool utils_equal(double a, double b) {
+    return (((a < b) ? b - a : a - b) <= DOUBLE_EPSILON);
+}
 
 bool utils_almost_equal(double a, double b) {
-    return (((a < b)? b - a : a - b) <= DOUBLE_EPSILON);
+    return (((a < b)? b - a : a - b) <= DOUBLE_ALMOST_EPSILON);
 }
 
 bool utils_vector_equal(Vector2 v1, Vector2 v2) {

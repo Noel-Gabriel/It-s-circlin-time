@@ -5,15 +5,19 @@
 #include "src/complex.h"
 
 #include <assert.h>
+#include <math.h>
+#include <stdio.h>
 
 void test_core_segment_lengths(void);
 void test_core_lerp_trace(void);
 void test_core_numeric_integration(void);
+void test_core_fourier_coefficients(void);
 
 void test_core(void) {
     test_core_segment_lengths();
     test_core_lerp_trace();
     test_core_numeric_integration();
+    test_core_fourier_coefficients();
 }
 
 void test_core_segment_lengths(void) {
@@ -125,8 +129,8 @@ void test_core_numeric_integration(void) {
     Complex expected = {1.0*8/3, 0};
     assert(complex_equal(integral, expected));
 
-    // integral of f(z) = conjugate(z) 
-    // on C(t) = 3t + t^2 from -1 to 4.
+    // integral of f(z) = z
+    // on C(t) = 3*t-i*t^2 from -1 to 4.
     from = -1;
     to = 4;
     double dt = (to - 1.0 * from) / num_samples;
@@ -138,9 +142,32 @@ void test_core_numeric_integration(void) {
     }
 
     integral = core_numeric_integration(points, dt, num_samples);
-    Complex expected2 = {22.5, -21.6667};
-    complex_print(integral);
+    Complex expected2 = {22.5, -21.666667};
     assert(complex_equal(integral, expected2));
 
     free(points);
+}
+
+void test_core_fourier_coefficients(void) {
+    // circle with radius 1
+    DArray* darray = darray_create();
+    int num_samples = 10000;
+    double dt = 2 * PI / num_samples;
+    double t = 0.0;
+    for(int i = 0; i < num_samples; ++i) {
+        Vector2 v = {cos(t),  sin(t)};
+        darray_insert(darray, v);
+        t += dt;
+    }
+    size_t num_coeffs = 20;
+    Complex* coeffs = core_fourier_coeffs(darray, 0.01 , num_coeffs);
+    Complex center = {0, 0};
+    Complex radius = {1, 0};
+    assert(complex_equal(coeffs[0], center));
+    assert(complex_equal(coeffs[1], radius));
+    for(int i = 2; i < num_coeffs; ++i) {
+        assert(complex_equal(coeffs[i], center));
+    }
+    free(coeffs);
+    darray_free(darray);
 }

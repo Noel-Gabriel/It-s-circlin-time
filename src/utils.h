@@ -5,6 +5,7 @@
 #include <raylib.h>
 
 
+bool utils_equal(double a, double b);
 bool utils_almost_equal(double a, double b);
 bool utils_vector_equal(Vector2 v1, Vector2 v2);
 Vector2 utils_vector_add(Vector2 v1, Vector2 v2);

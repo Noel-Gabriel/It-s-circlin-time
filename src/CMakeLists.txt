@@ -3,4 +3,5 @@ target_sources(CirclinTime PRIVATE
     darray.c darray.h
     utils.c utils.h
     complex.c complex.h
-    core.c core.h)
+    core.c core.h
+    circle.c circle.h)
