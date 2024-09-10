@@ -45,13 +45,13 @@ double* core_segment_lengths(DArray* trace) {
  * each at equal distance from each other (curve_length / 10) starting with
  * the first point.
  */
+    // parameterize from t = 0 to t = 1 for whole curve
 Complex* core_lerp_trace(DArray* trace, double dt, size_t* num_points) {
     if(trace == NULL || !(0 < dt && dt <= 1)) { return NULL; }
     double* segment_lengths = core_segment_lengths(trace);
     if(segment_lengths == NULL) { return NULL; }
 
 
-    // parameterize from t = 0 to t = 1 for whole curve
     double step = segment_lengths[trace->size-1] / (1 / dt);
     *num_points = (size_t)floor(1 / dt);
     Complex* points = malloc(*num_points * sizeof(Complex));

@@ -16,12 +16,10 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 #define FPS 60
-#define DT 0.001
-
+#define DT 0.0001 
 
 Circle* circles = NULL;
 size_t num_circles = 0;
-double t = 0.0;
 
 void make_circles(DArray* trace) {
     size_t num_coeffs = 300;
@@ -30,11 +28,10 @@ void make_circles(DArray* trace) {
     num_circles = num_coeffs;
     for(int i = 0; i < num_coeffs; ++i) {
         int n = (i % 2 == 0)? -1 * i / 2 : (i + 1) / 2;
-        Circle c = {coefficients[i], (n == 0)? 0 : n * 2 * PI / (FPS)};
+        Circle c = {coefficients[i], (n == 0)? 0 : (n * 2 * PI)};
         circles[i] = c;
-        complex_print(coefficients[i]);
-        printf("\n");
     }
+    free(coefficients);
 }
 
 void get(DArray* trace) {
@@ -76,7 +73,7 @@ int main(void) {
             get(trace);
             draw_trace(trace);
             circle_draw(circles, num_circles);
-            circle_step(circles, num_circles, &t, DT);
+            circle_step(circles, num_circles, (1.0/(FPS * 10)));
         EndDrawing();
     }
     CloseWindow();

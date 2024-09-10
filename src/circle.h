@@ -9,7 +9,7 @@ typedef struct Circle {
     double freq; 
 } Circle;
 
-void circle_step(Circle* circles, size_t num_circles, double* t, double dt);
+void circle_step(Circle* circles, size_t num_circles, double dt);
 void circle_draw(Circle* circles, size_t num_circles);
 
 #endif
