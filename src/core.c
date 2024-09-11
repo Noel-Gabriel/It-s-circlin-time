@@ -9,17 +9,7 @@
 #include <assert.h>
 #include <math.h>
 
-/**
- * Computes the length of the arc from the starting point in the DArray to any
- * other point in the DArray.
- *
- * The length of the returned array is always equal to the number of points in
- * the DArray (size).
- *
- * Thus, for the returned array arr, the last element in arr represents
- * the total arc length of the curve (linearly interpolated)
- * given by the points in the DArray.
- */
+
 double* core_segment_lengths(DArray* trace) {
     assert(trace != NULL);
     if(trace->size < 2) { return NULL; }
@@ -37,28 +27,21 @@ double* core_segment_lengths(DArray* trace) {
     return len;
 }
 
-/**
- * Parameterizes the interpolated curve in DArray and returns the point at every
- * dt time step (paramerization from t = 0 to t = 1).
- *
- * E.g, for dt = 0.1, this function returns (1 / 0.1) = 10 points, 
- * each at equal distance from each other (curve_length / 10) starting with
- * the first point.
- */
-    // parameterize from t = 0 to t = 1 for whole curve
+
 Complex* core_lerp_trace(DArray* trace, double dt, size_t* num_points) {
     if(trace == NULL || !(0 < dt && dt <= 1)) { return NULL; }
     double* segment_lengths = core_segment_lengths(trace);
     if(segment_lengths == NULL) { return NULL; }
 
-
+    // step to move forward along the curve
     double step = segment_lengths[trace->size-1] / (1 / dt);
     *num_points = (size_t)floor(1 / dt);
     Complex* points = malloc(*num_points * sizeof(Complex));
-    assert(points != NULL);
-    assert(!utils_equal(step, 0.0));
+    if(points == NULL || step == 0.0) { 
+        free(segment_lengths);
+        return NULL; 
+    }
     
- 
     double dist = 0.0;
     int segment = 1;
     for(int i = 0; i < *num_points; ++i) {
@@ -85,6 +68,7 @@ Complex* core_lerp_trace(DArray* trace, double dt, size_t* num_points) {
  */
 Complex core_numeric_integration(Complex* samples, double dt, size_t num_samples) {
     Complex integral = {0, 0};
+    // Sum(f(0)*dt, f(dt)*dt, f(2*dt)*dt, ...)
     for(int i = 0; i < num_samples; ++i) {
         integral = complex_add(integral, complex_scale(samples[i], dt));
     }
@@ -100,8 +84,8 @@ Complex core_numeric_integration(Complex* samples, double dt, size_t num_samples
 Complex* core_fourier_coeffs(DArray* trace, double dt, size_t num_coeffs) {
     size_t size = 0;
     Complex* points = core_lerp_trace(trace, dt, &size);
+    if(points == NULL) { return NULL; }
     Complex* points_copy = malloc(size * sizeof(Complex));
-    assert(points != NULL);
     assert(points_copy != NULL);
 
     // copy
@@ -113,9 +97,11 @@ Complex* core_fourier_coeffs(DArray* trace, double dt, size_t num_coeffs) {
     assert(coefficients != NULL);
     
     for(int i = 0; i < num_coeffs; ++i) {
+        // Alternating sequence; 0, 1, -1, 2, -2, ...
         int n = (i % 2 == 0)? -1 * i/2 : (i+1)/2;
         double t = 0.0;
         for(int p = 0; p < size; ++p) {
+            // integral from 0 to 1 of f(t)*e^(-n*2*pi*t)*dt
             double w = -1 * n * 2 * PI * t;
             Complex e = {cos(w), sin(w)};
             points_copy[p] = complex_mult(points[p], e);

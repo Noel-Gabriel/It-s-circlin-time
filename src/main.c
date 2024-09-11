@@ -8,26 +8,35 @@
 #include "src/utils.h"
 #include "src/circle.h"
 
+// Sliders
 #define RAYGUI_IMPLEMENTATION
 #include "extern/raygui.h"
 
 #include <stdio.h>
 #include <raylib.h>
 
-// Raylib & GUI 
+/**** Raylib & GUI ****/
+
+// Window
 #define WINDOW_WIDTH 1300
 #define WINDOW_HEIGHT 600
+#define BG_COLOR (Color){0, 3, 75, 255}
+#define FPS 60
+
+// Canvas (drawing area)
 #define CANVAS_WIDTH (WINDOW_WIDTH - 400)
 #define CANVAS_HEIGHT WINDOW_HEIGHT
-#define SIDEBAR_WIDTH (WINDOW_WIDTH - CANVAS_WIDTH)
-
 #define CANVAS_COLOR BLACK
 #define CANVAS_BORDER_THICKNESS 3.0f
 #define CANVAS_BORDER_COLOR WHITE
-#define BG_COLOR (Color){0, 3, 75, 255}
+
+
+// Sidebar (sliders)
+#define SIDEBAR_WIDTH (WINDOW_WIDTH - CANVAS_WIDTH)
+
+// User drawing
 #define TRACE_COLOR WHITE 
 #define TRACE_LINE_THICKNESS 3.0f
-#define FPS 60
 
 // Fourier Transform and update
 #define DT 0.0001        // time step through drawn curve from t = 0 to t = 1 
@@ -36,29 +45,35 @@
 
 
 
-void read_input(DArray* trace, FourierTransform* ft, bool* is_drawing) {
+void read_input(DArray* trace, FourierSeries* fs, bool* is_drawing) {
     Vector2 mouse_pos = GetMousePosition();
+    // Reset when new drawing
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        circle_free(ft);
+        circle_free(fs);
         darray_clear(trace);
         *is_drawing = true;
     }
+    // save traced curve when holding mouse button
     if(IsMouseButtonDown(MOUSE_BUTTON_LEFT) && *is_drawing) {
         if(trace->size == 0 
                 || !utils_vector_equal(trace->points[trace->size-1], mouse_pos)) {
             darray_insert(trace, mouse_pos);
         } 
+    // done drawing
     } else if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && *is_drawing){
         *is_drawing = false;
+        // close loop
         darray_insert(trace, trace->points[0]);
+        // need at least (different) 2 points
         if(trace->size < 3) {
             darray_clear(trace);
             return;
         }
-        circle_create(trace, NUM_COEFFS, DT, ft);
+        circle_create(trace, NUM_COEFFS, DT, fs);
     } 
 }
 
+// draws user trace
 void draw_trace(DArray* trace) {
     for(size_t i = 1; i < trace->size; ++i) {
         DrawLineEx(trace->points[i-1], 
@@ -109,9 +124,9 @@ int main(void) {
         time_slider.width, 40.0f};
     /**********************************************************************************/
 
-    struct FourierTransform ft;
-    ft.circles = NULL;
-    ft.num_circles = 0;
+    struct FourierSeries fs;
+    fs.circles = NULL;
+    fs.num_circles = 0;
 
     // to fix a bug where read_input would not reset if a user
     // enters the canvas while holding down the mouse button
@@ -119,10 +134,11 @@ int main(void) {
 
     SetTargetFPS(FPS);
     while(!WindowShouldClose()) {
-   
+  
+        // Read input
         Vector2 mouse_pos = GetMousePosition();
         if(CheckCollisionPointRec(mouse_pos, canvas)) {
-            read_input(trace, &ft, &is_drawing);
+            read_input(trace, &fs, &is_drawing);
         }
 
         BeginDrawing();
@@ -132,7 +148,7 @@ int main(void) {
             DrawRectangleRec(canvas, CANVAS_COLOR);
             DrawRectangleLinesEx(canvas, CANVAS_BORDER_THICKNESS, CANVAS_BORDER_COLOR); 
 
-            // Sidebar
+            /*** Sidebar ***/
 
             // Coefficients settings
             GuiDrawText("Number of Coefficients", num_circles_text, TEXT_ALIGN_CENTER, WHITE); 
@@ -142,11 +158,11 @@ int main(void) {
             GuiDrawText("Seconds per Loop", time_text, TEXT_ALIGN_CENTER, WHITE); 
             GuiSlider(time_slider, "1", "10",  &time_per_loop, 1, MAX_SECONDS_PER_LOOP);
 
-            // User drawing and Fourier transformation
+            // User drawing and FourierSeries evaluation
             draw_trace(trace);
-            if(ft.circles != NULL) {
-                circle_draw(&ft, (int)num_circles+1);
-                circle_step(&ft, (1.0 / (FPS * time_per_loop)));
+            if(fs.circles != NULL) {
+                circle_draw(&fs, (int)num_circles+1);
+                circle_step(&fs, (1.0 / (FPS * time_per_loop)));
 ;
             }
 
@@ -155,7 +171,7 @@ int main(void) {
 
     CloseWindow();
     darray_free(trace);
-    circle_free(&ft);
+    circle_free(&fs);
 
     return 0;
 }

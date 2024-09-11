@@ -41,6 +41,7 @@ void dllist_pop_back(DLList* list) {
 
 void dllist_free(DLList* list) {
     DLLNode* to_remove = list->head;
+    // free memory of all nodes
     while(to_remove != NULL) {
         DLLNode* next = to_remove->succ;
         free(to_remove);

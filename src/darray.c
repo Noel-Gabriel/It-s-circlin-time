@@ -1,6 +1,8 @@
 #include "stdio.h"
 #include "darray.h"
 
+#include <assert.h>
+
 DArray* darray_create(void) {
     DArray* darray = malloc(sizeof *darray);
     darray->points = malloc(INITIAL_CAPACITY * sizeof *(darray->points));
@@ -13,10 +15,7 @@ void darray_insert(DArray* darray, Vector2 p) {
     if(darray == NULL) { return; }
     if(darray->size == darray->capacity) {
         Vector2* temp = realloc(darray->points, darray->capacity * 2 * sizeof(Vector2));
-        if(temp == NULL) {
-            printf("DArray Realloc failed.");
-            return;
-        }
+        assert(temp == NULL);
         darray->points = temp;
         darray->capacity *= 2;
     }
