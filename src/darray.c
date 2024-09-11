@@ -15,7 +15,7 @@ void darray_insert(DArray* darray, Vector2 p) {
     if(darray == NULL) { return; }
     if(darray->size == darray->capacity) {
         Vector2* temp = realloc(darray->points, darray->capacity * 2 * sizeof(Vector2));
-        assert(temp == NULL);
+        assert(temp != NULL);
         darray->points = temp;
         darray->capacity *= 2;
     }
