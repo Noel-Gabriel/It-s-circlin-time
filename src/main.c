@@ -7,6 +7,7 @@
 #include "src/darray.h"
 #include "src/utils.h"
 #include "src/circle.h"
+#include "src/svgloader.h"
 
 // Sliders
 #define RAYGUI_IMPLEMENTATION
@@ -42,6 +43,10 @@
 #define DT 0.0001        // time step through drawn curve from t = 0 to t = 1 
 #define NUM_COEFFS 300 
 #define MAX_SECONDS_PER_LOOP 10
+
+// SVG Loading
+#define SVG_SAMPLE_DT 0.01
+#define MAX_PATH_SIZE 200
 
 
 
@@ -124,6 +129,20 @@ int main(void) {
         time_slider.width, 40.0f};
     /**********************************************************************************/
 
+    /**************************** SVG LOADER ******************************************/
+    char* path = malloc(MAX_PATH_SIZE * sizeof(char));
+    if(path == NULL) { return 1; }
+
+    Rectangle path_bounds = {CANVAS_WIDTH + SIDEBAR_WIDTH/4.0f, 
+        500.0f, 
+        SIDEBAR_WIDTH/2.0f, 
+        30.0f};
+
+    Rectangle path_text = {path_bounds.x, path_bounds.y - 40.0f, 
+        path_bounds.width, 40.0f};
+    /**********************************************************************************/
+
+
     struct FourierSeries fs;
     fs.circles = NULL;
     fs.num_circles = 0;
@@ -157,6 +176,19 @@ int main(void) {
             // Speed settings
             GuiDrawText("Seconds per Loop", time_text, TEXT_ALIGN_CENTER, WHITE); 
             GuiSlider(time_slider, "1", "10",  &time_per_loop, 1, MAX_SECONDS_PER_LOOP);
+            
+            // svg loading
+            GuiDrawText("Load svg", path_text, TEXT_ALIGN_CENTER, WHITE);
+            if(GuiTextBox(path_bounds, path, MAX_PATH_SIZE, true)) {
+                DArray* svg = svgloader_sample_svg(path, SVG_SAMPLE_DT, CANVAS_WIDTH, CANVAS_HEIGHT);
+                if(svg != NULL) {
+                    darray_free(trace);
+                    circle_free(&fs);
+                    trace = svg;
+                    circle_create(trace, NUM_COEFFS, DT, &fs);
+                }
+                path[0] = '\0';
+            }
 
             // User drawing and FourierSeries evaluation
             draw_trace(trace);
