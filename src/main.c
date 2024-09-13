@@ -19,13 +19,13 @@
 /**** Raylib & GUI ****/
 
 // Window
-#define WINDOW_WIDTH 1300
+#define WINDOW_WIDTH 1200
 #define WINDOW_HEIGHT 600
 #define BG_COLOR (Color){0, 3, 75, 255}
 #define FPS 60
 
 // Canvas (drawing area)
-#define CANVAS_WIDTH (WINDOW_WIDTH - 400)
+#define CANVAS_WIDTH (WINDOW_WIDTH - 300)
 #define CANVAS_HEIGHT WINDOW_HEIGHT
 #define CANVAS_COLOR BLACK
 #define CANVAS_BORDER_THICKNESS 3.0f
@@ -42,7 +42,7 @@
 // Fourier Transform and update
 #define DT 0.0001        // time step through drawn curve from t = 0 to t = 1 
 #define NUM_COEFFS 300 
-#define MAX_SECONDS_PER_LOOP 10
+#define MAX_SECONDS_PER_LOOP 60
 
 // SVG Loading
 #define SVG_SAMPLE_DT 0.01
@@ -50,10 +50,15 @@
 
 
 
-void read_input(DArray* trace, FourierSeries* fs, bool* is_drawing) {
+void read_input(DArray* trace, FourierSeries* fs, bool* is_drawing, bool* is_following) {
     Vector2 mouse_pos = GetMousePosition();
     // Reset when new drawing
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        // get out of zoom
+        if(*is_following) {
+            *is_following = false;
+            return;
+        }
         circle_free(fs);
         darray_clear(trace);
         *is_drawing = true;
@@ -108,7 +113,7 @@ int main(void) {
     float num_circles = 1.0;
 
     Rectangle num_circles_slider = {CANVAS_WIDTH + SIDEBAR_WIDTH/4.0f, 
-        100.0f, 
+        80.0f, 
         SIDEBAR_WIDTH/2.0f, 
         30.0f};
 
@@ -121,7 +126,7 @@ int main(void) {
     float time_per_loop = 1.0;
 
     Rectangle time_slider = {CANVAS_WIDTH + SIDEBAR_WIDTH/4.0f, 
-        300.0f, 
+        180.0f, 
         SIDEBAR_WIDTH/2.0f, 
         30.0f};
 
@@ -134,7 +139,7 @@ int main(void) {
     if(path == NULL) { return 1; }
 
     Rectangle path_bounds = {CANVAS_WIDTH + SIDEBAR_WIDTH/4.0f, 
-        500.0f, 
+        280.0f, 
         SIDEBAR_WIDTH/2.0f, 
         30.0f};
 
@@ -142,26 +147,55 @@ int main(void) {
         path_bounds.width, 40.0f};
     /**********************************************************************************/
 
+   /**************************** FOLLOW & ZOOM ****************************************/
+    Rectangle follow_bounds = {CANVAS_WIDTH + SIDEBAR_WIDTH/2.0f - SIDEBAR_WIDTH/8.0f, 
+        380.0f, 
+        SIDEBAR_WIDTH/4.0f, 
+        30.0f};
+    /**********************************************************************************/
 
     struct FourierSeries fs;
     fs.circles = NULL;
     fs.num_circles = 0;
+    fs.last_results = NULL;
 
     // to fix a bug where read_input would not reset if a user
     // enters the canvas while holding down the mouse button
     bool is_drawing = false;
+
+    // whether the user is currently zoomed in
+    bool is_following = false;
+
+    Camera2D camera = {
+        (Vector2){WINDOW_WIDTH/2.0f, WINDOW_HEIGHT/2.0f},
+        (Vector2){WINDOW_WIDTH/2.0f, WINDOW_HEIGHT/2.0f},
+        0.0,
+        1.0
+    };
 
     SetTargetFPS(FPS);
     while(!WindowShouldClose()) {
   
         // Read input
         Vector2 mouse_pos = GetMousePosition();
-        if(CheckCollisionPointRec(mouse_pos, canvas)) {
-            read_input(trace, &fs, &is_drawing);
+        if(CheckCollisionPointRec(mouse_pos, canvas) || is_following) {
+            read_input(trace, &fs, &is_drawing, &is_following);
+        }
+        
+        if(!is_following) {
+            camera.target = (Vector2){WINDOW_WIDTH/2.0f, WINDOW_HEIGHT/2.0f};
+            camera.zoom = 1.0f;
+        } else {
+            if(fs.last_results != NULL && fs.last_results->size > 0) {
+                camera.target = complex_to_vec(fs.last_results->head->c);
+                camera.zoom = 5.0f;
+            }
         }
 
         BeginDrawing();
-            
+           
+            BeginMode2D(camera);
+
             // Background and drawing area
             ClearBackground(BG_COLOR);
             DrawRectangleRec(canvas, CANVAS_COLOR);
@@ -190,6 +224,8 @@ int main(void) {
                 path[0] = '\0';
             }
 
+            is_following = is_following || GuiButton(follow_bounds, "Follow!");
+
             // User drawing and FourierSeries evaluation
             draw_trace(trace);
             if(fs.circles != NULL) {
@@ -197,6 +233,8 @@ int main(void) {
                 circle_step(&fs, (1.0 / (FPS * time_per_loop)));
 ;
             }
+
+            EndMode2D();
 
         EndDrawing();
     }

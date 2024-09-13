@@ -17,7 +17,7 @@
 // Color of the trace effect of past results
 #define CIRCLE_TRACE_COLOR YELLOW
 // Thickness of the trace effect of past results
-#define CIRCLE_TRACE_THICKNESS 10.0f
+#define CIRCLE_TRACE_THICKNESS 5.0f
 
 void circle_free(FourierSeries* fs) {
     if(fs == NULL || fs->circles == NULL) { return; }
