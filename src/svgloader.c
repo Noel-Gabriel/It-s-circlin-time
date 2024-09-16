@@ -58,19 +58,12 @@ DArray* svgloader_sample_svg(const char* path, double dt, float width, float hei
     NSVGimage* image = nsvgParseFromFile(path, "px", 96.0f);
     if(image == NULL) { return NULL; }
 
-    printf("LOADED %s\n", path);
-
     // scale to fit given width and height, maintaining ratios and center
     float scale = svgloader_scale_to_fit(width, height, image->width, image->height);
 
     float x_offset = (width - image->width * scale) / 2.0f;
     float y_offset = (height - image->height * scale) / 2.0f;
     
-    printf("SCALE: %f\n", scale);
-    printf("SVG WIDTH: %f\n", image->width);
-    printf("NEW SVG WIDTH: %f\n", image->width * scale);
-    printf("SVG HEIGHT: %f\n", image->height);
-    printf("NEW SVG HEIGHT: %f\n", image->height * scale);
     // go through all paths given as cubic bezier curves by nanoSVG
     DArray* sampled_points = darray_create();
     for(NSVGshape* shape = image->shapes; shape != NULL; shape = shape->next) {

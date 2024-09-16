@@ -6,4 +6,5 @@ target_sources(CirclinTime PRIVATE
     core.c core.h
     circle.c circle.h
     dllist.c dllist.h
-    svgloader.c svgloader.h)
+    svgloader.c svgloader.h
+    gui.c gui.h)
