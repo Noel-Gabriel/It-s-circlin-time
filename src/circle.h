@@ -6,7 +6,7 @@
 #include "dllist.h"
 
 /**
- * One circle drawn on screen, c is the fourier coeffiecient
+ * One circle drawn on screen, c is the fourier coefficient
  * for the respective frequency freq.
  */
 typedef struct Circle {
@@ -17,7 +17,7 @@ typedef struct Circle {
 /**
  * All coefficients for the given function/trace on screen.
  *
- * Last _results holds past evaluations of the fourier transform.
+ * Last_results holds past evaluations of the fourier transform.
  */
 typedef struct FourierSeries {
     struct Circle* circles;
